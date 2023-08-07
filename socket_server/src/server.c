@@ -17,33 +17,28 @@
 #include "parson.h"
 #include "base64.h"
 
-// JSON_Value *root_val = NULL;
-// JSON_Object *txpk_obj = NULL;
-// JSON_Value *val = NULL; /* needed to detect the absence of some fields */
-// const char *str; /* pointer to sub-strings in the JSON data */
-
 #define PORT 8080
 
-// struct addrinfo hints;
-// struct addrinfo *result; /* store result of getaddrinfo */
-// struct addrinfo *q; /* pointer to move into *result data */
-char host_name[64];
-char port_name[64];
+// uint8_t data_send[] =
+//     {
+//         2, token_h, token_l, 3, 'M', 'A', 'C', '*', 'M', 'A', 'C', '#',
+//         /* JSON string */
+//         '{', '"', 't', 'x', 'p', 'k', '"', ':', ' ', '{', '"', 'i', 'm', 'm', 'e', '"',
+//         ':', ' ', 't', 'r', 'u', 'e', ',', '"', 'f', 'r', 'e', 'q', '"', ':', ' ', '4', '3', '3',
+//         '.', '6', ',', '"', 'r', 'f', 'c', 'h', '"', ':', ' ', '0', ',', '"', 'm', 'o',
+//         'd', 'u', '"', ':', ' ', '"', 'L', 'O', 'R', 'A', '"', ',', '"', 'd', 'a', 't', 'r',
+//         '"', ':', ' ', '"', 'S', 'F', '0', '7', 'B', 'W', '1', '2', '5', '"', ',', '"', 'c',
+//         'o', 'd', 'r', '"', ':', ' ', '"', '4', '/', '5', '"', ',', '"', 'i', 'p', 'o', 'l',
+//         '"', ':', ' ', 'f', 'a', 'l', 's', 'e', ',', '"', 's', 'i', 'z', 'e', '"', ':', ' ', '1',
+//         '6', ',', '"', 'd', 'a', 't', 'a', '"', ':', ' ', '"', 'S', 'G', 'l', 'Q', 'b', '3', 'J',
+//         '5', 'Y', 'U', 'h', 'v', 'd', '0', 'F', 'y', 'Z', 'V', 'l', 'v', 'd', 'Q', '=', '=', '"', ',', '"', 'n', 'c', 'r', 'c', '"', ':', ' ', 'f', 'a', 'l', 's', 'e', ',', '"',
+//         'n', 'h', 'd', 'r', '"', ':', ' ', 'f', 'a', 'l', 's', 'e', ',', '"', 'p', 'r', 'e', 'a',
+//         '"', ':', ' ', '8', ',', '"', 'p', 'o', 'w', 'e', '"', ':', ' ', '2', '7', '}', '}'};
 
 void error(const char *msg)
 {
     perror(msg);
     exit(1);
-}
-
-void test_data(uint8_t *data)
-{
-    // printf("test_data: {%s}\n",data);
-    // printf("test_data: {%s}\n",(char *)(data+12));
-    // root_val = json_parse_string_with_comments((const char *)(data + 12)); /* JSON offset */
-    // if(root_val == NULL) {
-    //      printf("WARNING: [down] invalid JSON\n");
-    // }
 }
 
 int main(int argc, char *argv[])
@@ -53,17 +48,12 @@ int main(int argc, char *argv[])
     char buffer[256];
     struct sockaddr_in serv_addr, cli_addr;
     int n;
-    // create a socket
-    // socket(int domain, int type, int protocol)
-    //  sockfd =  socket(AF_INET, SOCK_STREAM, 0);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)
         error("ERROR opening socket");
 
     // clear address structure
     bzero((char *)&serv_addr, sizeof(serv_addr));
-
-    portno = PORT; // atoi(argv[1]);
 
     /* setup the host_addr structure for use in bind call */
     // server byte order
@@ -73,14 +63,17 @@ int main(int argc, char *argv[])
     serv_addr.sin_addr.s_addr = INADDR_ANY;
 
     // convert short integer value for port must be converted into network byte order
-    serv_addr.sin_port = htons(portno);
+    serv_addr.sin_port = htons(PORT);
 
     // bind(int fd, struct sockaddr *local_addr, socklen_t addr_length)
     // bind() passes file descriptor, the address structure,
     // and the length of the address structure
     // This bind() call will bind  the socket to the current IP address on port, portno
     if (bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    {
         error("ERROR on binding");
+    }
+
     printf("server start listening on port (%d) ...\r\n", PORT);
     // This listen() call tells the socket to listen to the incoming connections.
     // The listen() function places all incoming connection into a backlog queue
@@ -106,21 +99,6 @@ int main(int argc, char *argv[])
     printf("server: got connection from %s port %d\n", inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port));
     uint8_t token_h = (uint8_t)rand(); /* random token */
     uint8_t token_l = (uint8_t)rand(); /* random token */
-                                       // uint8_t data_send[] =
-                                       //     {
-                                       //         2, token_h, token_l, 3, 'M', 'A', 'C', '*', 'M', 'A', 'C', '#',
-                                       //         /* JSON string */
-                                       //         '{', '"', 't', 'x', 'p', 'k', '"', ':', ' ', '{', '"', 'i', 'm', 'm', 'e', '"',
-                                       //         ':', ' ', 't', 'r', 'u', 'e', ',', '"', 'f', 'r', 'e', 'q', '"', ':', ' ', '4', '3', '3',
-                                       //         '.', '6', ',', '"', 'r', 'f', 'c', 'h', '"', ':', ' ', '0', ',', '"', 'm', 'o',
-                                       //         'd', 'u', '"', ':', ' ', '"', 'L', 'O', 'R', 'A', '"', ',', '"', 'd', 'a', 't', 'r',
-                                       //         '"', ':', ' ', '"', 'S', 'F', '0', '7', 'B', 'W', '1', '2', '5', '"', ',', '"', 'c',
-                                       //         'o', 'd', 'r', '"', ':', ' ', '"', '4', '/', '5', '"', ',', '"', 'i', 'p', 'o', 'l',
-                                       //         '"', ':', ' ', 'f', 'a', 'l', 's', 'e', ',', '"', 's', 'i', 'z', 'e', '"', ':', ' ', '1',
-                                       //         '6', ',', '"', 'd', 'a', 't', 'a', '"', ':', ' ', '"', 'S', 'G', 'l', 'Q', 'b', '3', 'J',
-                                       //         '5', 'Y', 'U', 'h', 'v', 'd', '0', 'F', 'y', 'Z', 'V', 'l', 'v', 'd', 'Q', '=', '=', '"', ',', '"', 'n', 'c', 'r', 'c', '"', ':', ' ', 'f', 'a', 'l', 's', 'e', ',', '"',
-                                       //         'n', 'h', 'd', 'r', '"', ':', ' ', 'f', 'a', 'l', 's', 'e', ',', '"', 'p', 'r', 'e', 'a',
-                                       //         '"', ':', ' ', '8', ',', '"', 'p', 'o', 'w', 'e', '"', ':', ' ', '2', '7', '}', '}'};
 
     uint8_t data_send[255] = {2, token_h, token_l, 3, 'M', 'A', 'C', '*', 'M', 'A', 'C', '#'};
 
@@ -135,20 +113,15 @@ int main(int argc, char *argv[])
         printf("Failed to parse JSON file.\n");
         return 1;
     }
+
     string_value = json_serialize_to_string(root);
     size_t buf_size_bytes = json_serialization_size(value);
-    strncat(data_send,string_value,buf_size_bytes);
+    strncat(data_send, string_value, buf_size_bytes);
     data_send[12 + buf_size_bytes + 1] = '\n';
-    // test_data(data_send);
     printf("server start loop");
 
     while (1)
     {
-        // This send() function sends the 13 bytes of the string to the new socket
-        // uint8_t *data_send = {2,120,120,0,120,120,120,120,120,0};
-        // send(newsockfd, data_send, sizeof(data_send), 0);
-
-        // bzero(buffer,256);
         n = read(newsockfd, buffer, 255);
         if (n < 0)
             error("ERROR reading from socket");
