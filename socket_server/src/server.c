@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* The port number is passed as an argument */
-
 #include <sys/socket.h> /* socket specific definitions */
 #include <netinet/in.h> /* INET constants and stuff */
 #include <arpa/inet.h>  /* IP address conversion stuff */
@@ -115,7 +113,7 @@ int main(int argc, char *argv[])
     }
 
     string_value = json_serialize_to_string(root);
-    size_t buf_size_bytes = json_serialization_size(value);
+    size_t buf_size_bytes = json_serialization_size(root);
     strncat(data_send, string_value, buf_size_bytes);
     data_send[12 + buf_size_bytes + 1] = '\n';
     printf("server start loop");
