@@ -1,0 +1,16 @@
+{
+    "txpk": {
+      "imme": true,
+      "freq": 433.33, 
+      "rfch": 0,
+      "modu": "LORA",
+      "datr": "SF10BW125",
+      "codr": "4/5",
+      "ipol": false, 
+      "size": 16,
+      "data": "HIPoryaHowAreYou",
+      "ncrc": false,
+      "nhdr": false,
+      "prea":8
+    }
+}

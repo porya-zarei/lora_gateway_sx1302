@@ -1,0 +1,299 @@
+{
+  "SX130x_conf": {
+      "com_type": "SPI",
+      "com_path": "/dev/spidev0.0",
+      "lorawan_public": true,
+      "clksrc": 0,
+      "antenna_gain": 0,
+      "full_duplex": false,
+      "precision_timestamp": {
+        "enable": false,
+        "max_ts_metrics": 255,
+        "nb_symbols": 1
+      },
+      "lbt_cfg": {
+        "enable": true,
+        "rssi_target": -80, 
+        "chan_cfg":[ 
+            { "freq_hz": 433000000, "scan_time_us": 1280 },
+            { "freq_hz": 433200000, "scan_time_us": 1280 },
+            { "freq_hz": 433400000, "scan_time_us": 1280 },
+            { "freq_hz": 433600000, "scan_time_us": 1280 },
+            { "freq_hz": 433800000, "scan_time_us": 1280 },
+            { "freq_hz": 434000000, "scan_time_us": 1280 }
+        ],
+        "sx127x_rssi_offset": -40
+      },
+      "sx1261_conf": {
+        "spi_path": "/dev/spidev0.1",
+        "rssi_offset": 0,
+        "spectral_scan": {
+            "enable": true,
+            "freq_start": 433000000,
+            "nb_chan": 10,
+            "nb_scan": 10,
+            "pace_s": 1
+        },
+        "lbt": {
+            "enable": false,
+            "rssi_target": -70,
+            "channels":[
+                { "freq_hz": 433000000, "bandwidth": 125000, "scan_time_us": 128,  "transmit_time_ms": 400 },
+                { "freq_hz": 433200000, "bandwidth": 125000, "scan_time_us": 128,  "transmit_time_ms": 400 },
+                { "freq_hz": 433400000, "bandwidth": 125000, "scan_time_us": 128,  "transmit_time_ms": 400 },
+                { "freq_hz": 433600000, "bandwidth": 125000, "scan_time_us": 128,  "transmit_time_ms": 400 },
+                { "freq_hz": 433800000, "bandwidth": 125000, "scan_time_us": 128,  "transmit_time_ms": 400 },
+                { "freq_hz": 434000000, "bandwidth": 125000, "scan_time_us": 128,  "transmit_time_ms": 400 },
+                { "freq_hz": 434200000, "bandwidth": 125000, "scan_time_us": 128,  "transmit_time_ms": 400 },
+                { "freq_hz": 434400000, "bandwidth": 125000, "scan_time_us": 128,  "transmit_time_ms": 400 },
+                { "freq_hz": 434600000, "bandwidth": 125000, "scan_time_us": 128,  "transmit_time_ms": 400 },
+                { "freq_hz": 434800000, "bandwidth": 125000, "scan_time_us": 128,  "transmit_time_ms": 400 }
+            ]
+        }
+      },
+      "radio_0": {
+        "enable": true,
+        "type": "SX1250",
+        "freq": 433475000,
+        "rssi_offset": -176,
+        "tx_enable": true,
+        "tx_freq_min": 433000000,
+        "tx_freq_max": 435000000,
+        "single_input_mode":false,
+        "rssi_tcomp": {"coeff_a": 0, "coeff_b": 0, "coeff_c": 20.41, "coeff_d": 2162.56, "coeff_e": 0},
+        "tx_gain_lut":[
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  0},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  1},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  2},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  3},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  4},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  5},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  6},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  7},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  8},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  9},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 10},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 11},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 12},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 13},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 14},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 15}
+        ]
+      },
+      "radio_1": {
+        "enable": true,
+        "type": "SX1250",
+        "freq": 433000000,
+        "rssi_offset": -176,
+        "tx_enable": false,
+        "single_input_mode":false,
+        "rssi_tcomp": {"coeff_a": 0, "coeff_b": 0, "coeff_c": 20.41, "coeff_d": 2162.56, "coeff_e": 0},
+        "tx_gain_lut":[
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  0},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  1},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  2},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  3},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  4},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  5},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  6},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  7},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  8},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx":  9},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 10},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 11},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 12},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 13},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 14},
+          {"rf_power": 27, "pa_gain": 1, "pwr_idx": 15}
+        ]
+      },
+      "chan_multiSF_0": {
+        "enable": true,
+        "radio": 0,
+        "if": -300000
+      },
+      "chan_multiSF_1": {
+        "enable": true,
+        "radio": 0,
+        "if": -100000
+      },
+      "chan_multiSF_2": {
+        "enable": true,
+        "radio": 0,
+        "if": 100000
+      },
+      "chan_multiSF_3": {
+        "enable": true,
+        "radio": 0,
+        "if": 300000
+      },
+      "chan_multiSF_4": {
+        "enable": true,
+        "radio": 1,
+        "if": -300000
+      },
+      "chan_multiSF_5": {
+        "enable": true,
+        "radio": 1,
+        "if": -100000
+      },
+      "chan_multiSF_6": {
+        "enable": true,
+        "radio": 1,
+        "if": 100000
+      },
+      "chan_multiSF_7": {
+        "enable": true,
+        "radio": 1,
+        "if": 300000
+      },
+      "chan_multiSF_All": {"spreading_factor_enable": [ 5, 6, 7, 8, 9, 10, 11, 12 ]},
+      "chan_Lora_std": {
+        "enable": true,
+        "radio": 1,
+        "if": -200000,
+        "bandwidth": 250000,
+        "spread_factor": 8,
+        "implicit_hdr": false,
+        "implicit_payload_length": 17,
+        "implicit_crc_en": false,
+        "implicit_coderate": 1
+      },
+      "chan_FSK": {
+        "enable": false,
+        "radio":0,
+        "if":100000,
+        "bandwidth":125000,
+        "freq_deviation":100,
+        "datarate":1000000
+      },
+      "tx_lut_0": {
+        "pa_gain": 0,
+        "mix_gain": 8,
+        "rf_power": -6,
+        "dig_gain": 0
+      },
+      "tx_lut_1": {
+        "pa_gain": 0,
+        "mix_gain": 10,
+        "rf_power": -3,
+        "dig_gain": 0
+      },
+      "tx_lut_2": {
+        "pa_gain": 0,
+        "mix_gain": 12,
+        "rf_power": 0,
+        "dig_gain": 0
+      },
+      "tx_lut_3": {
+        "pa_gain": 1,
+        "mix_gain": 8,
+        "rf_power": 3,
+        "dig_gain": 0
+      },
+      "tx_lut_4": {
+        "pa_gain": 1,
+        "mix_gain": 10,
+        "rf_power": 6,
+        "dig_gain": 0
+      },
+      "tx_lut_5": {
+        "pa_gain": 1,
+        "mix_gain": 12,
+        "rf_power": 10,
+        "dig_gain": 0
+      },
+      "tx_lut_6": {
+        "pa_gain": 1,
+        "mix_gain": 13,
+        "rf_power": 11,
+        "dig_gain": 0
+      },
+      "tx_lut_7": {
+        "pa_gain": 2,
+        "mix_gain": 9,
+        "rf_power": 12,
+        "dig_gain": 0
+      },
+      "tx_lut_8": {
+        "pa_gain": 1,
+        "mix_gain": 15,
+        "rf_power": 13,
+        "dig_gain": 0
+      },
+      "tx_lut_9": {
+        "pa_gain": 2,
+        "mix_gain": 10,
+        "rf_power": 14,
+        "dig_gain": 0
+      },
+      "tx_lut_10": {
+        "pa_gain": 2,
+        "mix_gain": 11,
+        "rf_power": 16,
+        "dig_gain": 0
+      },
+      "tx_lut_11": {
+        "pa_gain": 3,
+        "mix_gain": 9,
+        "rf_power": 20,
+        "dig_gain": 0
+      },
+      "tx_lut_12": {
+        "pa_gain": 3,
+        "mix_gain": 10,
+        "rf_power": 23,
+        "dig_gain": 0
+      },
+      "tx_lut_13": {
+        "pa_gain": 3,
+        "mix_gain": 11,
+        "rf_power": 25,
+        "dig_gain": 0
+      },
+      "tx_lut_14": {
+        "pa_gain": 3,
+        "mix_gain": 12,
+        "rf_power": 26,
+        "dig_gain": 0
+      },
+      "tx_lut_15": {
+        "pa_gain": 3,
+        "mix_gain": 14,
+        "rf_power": 27,
+        "dig_gain": 0
+      }
+    },
+    "gateway_conf": {
+      "gateway_ID": "0016C001FF1F5632",
+      "server_address": "127.0.0.1",
+      "serv_port_up": 8080,
+      "serv_port_down": 8080,
+      
+      "keepalive_interval": 10,
+      "stat_interval": 30,
+      "push_timeout_ms": 100,
+
+      "forward_crc_valid": true,
+      "forward_crc_error": false,
+      "forward_crc_disabled": false,
+
+      "beacon_period": 0,
+      "beacon_freq_hz": 433000000,
+      "beacon_datarate": 9,
+      "beacon_bw_hz": 125000,
+      "beacon_power": 27,
+      "beacon_infodesc": 0,
+      "beacon_freq_nb":1,
+      "servers": [
+        {
+          "gateway_ID": "0016C001FF1F5632",
+          "server_address": "127.0.0.1",
+          "serv_port_up": 8080,
+          "serv_port_down": 8080,
+          "serv_enabled": true
+        }
+      ]
+    }
+  
+}

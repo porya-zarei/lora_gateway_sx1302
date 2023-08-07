@@ -728,10 +728,10 @@ static int parse_SX130x_configuration(const char * conf_file) {
                         conf_txgain_obj = json_array_get_object(conf_txlut_array, 0);
                         val = json_object_dotget_value(conf_txgain_obj, "pwr_idx");
                         if (val != NULL) {
-                            printf("INFO: Configuring Tx Gain LUT for rf_chain %u with %u indexes for sx1250\n", i, txlut[i].size);
+                            printf("INFO: Configuring Tx Gain LUT for rf_chain %u with %u indexes for sx1250 (%d)\n", i, txlut[i].size,true);
                             sx1250_tx_lut = true;
                         } else {
-                            printf("INFO: Configuring Tx Gain LUT for rf_chain %u with %u indexes for sx125x\n", i, txlut[i].size);
+                            printf("INFO: Configuring Tx Gain LUT for rf_chain %u with %u indexes for sx125x (%d)\n", i, txlut[i].size, false);
                             sx1250_tx_lut = false;
                         }
                         /* Parse the table */
@@ -1415,7 +1415,8 @@ static int send_tx_ack(uint8_t token_h, uint8_t token_l, enum jit_error_e error,
     buff_ack[buff_index] = 0; /* add string terminator, for safety */
 
     /* send datagram to server */
-    return send(sock_down, (void *)buff_ack, buff_index, 0);
+    // return send(sock_down, (void *)buff_ack, buff_index, 0);
+    return send(sock_up, (void *)buff_ack, buff_index, 0);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1573,10 +1574,13 @@ int main(int argc, char ** argv)
     /* prepare hints to open network sockets */
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET; /* WA: Forcing IPv4 as AF_UNSPEC makes connection on localhost to fail */
-    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_socktype = SOCK_STREAM;
+
+    // hints.ai_socktype = SOCK_DGRAM;
 
     /* look for server address w/ upstream port */
     i = getaddrinfo(serv_addr, serv_port_up, &hints, &result);
+    printf("INFO: [up] addrinfo on address %s (PORT %s)\n", serv_addr, serv_port_up);
     if (i != 0) {
         MSG("ERROR: [up] getaddrinfo on address %s (PORT %s) returned %s\n", serv_addr, serv_port_up, gai_strerror(i));
         exit(EXIT_FAILURE);
@@ -1633,6 +1637,10 @@ int main(int argc, char ** argv)
 
     /* connect so we can send/receive packet with the server only */
     i = connect(sock_down, q->ai_addr, q->ai_addrlen);
+
+    printf("INFO: connected to server => %d \r\n", sock_down);
+    // ssize_t res = send(sock_up, (void *)"hi server", 10, 0);
+    // printf("INFO: send 'hi server' to server => %d \r\n", res);
     if (i != 0) {
         MSG("ERROR: [down] connect returned %s\n", strerror(errno));
         exit(EXIT_FAILURE);
@@ -2010,7 +2018,7 @@ void thread_up(void) {
 
         /* fetch packets */
         pthread_mutex_lock(&mx_concent);
-        nb_pkt = lgw_receive(NB_PKT_MAX, rxpkt);
+        nb_pkt = lgw_receive(NB_PKT_MAX, rxpkt); // NB_PKT_MAX
         pthread_mutex_unlock(&mx_concent);
         if (nb_pkt == LGW_HAL_ERROR) {
             MSG("ERROR: [up] failed packet fetch, exiting\n");
@@ -2463,6 +2471,7 @@ void thread_up(void) {
         /* wait for acknowledge (in 2 times, to catch extra packets) */
         for (i=0; i<2; ++i) {
             j = recv(sock_up, (void *)buff_ack, sizeof buff_ack, 0);
+            // printf("ack response => %s\r\n",(char *)(buff_ack+4));
             clock_gettime(CLOCK_MONOTONIC, &recv_time);
             if (j == -1) {
                 if (errno == EAGAIN) { /* timeout */
@@ -2495,7 +2504,7 @@ static int get_tx_gain_lut_index(uint8_t rf_chain, int8_t rf_power, uint8_t * lu
     int current_best_index = -1;
     uint8_t current_best_match = 0xFF;
     int diff;
-
+    // printf("%s => rf_chain:%d, rf_power:%d",__FUNCTION__,rf_chain,rf_power);
     /* Check input parameters */
     if (lut_index == NULL) {
         MSG("ERROR: %s - wrong parameter\n", __FUNCTION__);
@@ -2651,6 +2660,7 @@ void thread_down(void) {
             MSG("ERROR: unsupported datarate for beacon\n");
             exit(EXIT_FAILURE);
     }
+
     beacon_pkt.size = beacon_RFU1_size + 4 + 2 + 7 + beacon_RFU2_size + 2;
     beacon_pkt.coderate = CR_LORA_4_5;
     beacon_pkt.invert_pol = false;
@@ -2720,7 +2730,8 @@ void thread_down(void) {
         buff_req[2] = token_l;
 
         /* send PULL request and record time */
-        send(sock_down, (void *)buff_req, sizeof buff_req, 0);
+        send(sock_up, (void *)buff_req, sizeof buff_req, 0);
+        // send(sock_down, (void *)buff_req, sizeof buff_req, 0);
         clock_gettime(CLOCK_MONOTONIC, &send_time);
         pthread_mutex_lock(&mx_meas_dw);
         meas_dw_pull_sent += 1;
@@ -2733,7 +2744,10 @@ void thread_down(void) {
         while (((int)difftimespec(recv_time, send_time) < keepalive_time) && !exit_sig && !quit_sig) {
 
             /* try to receive a datagram */
-            msg_len = recv(sock_down, (void *)buff_down, (sizeof buff_down)-1, 0);
+            // msg_len = recv(sock_down, (void *)buff_down, (sizeof buff_down)-1, 0);
+            msg_len = recv(sock_up, (void *)buff_down, (sizeof buff_down)-1, 0);
+            if (msg_len <= 0) break;
+            if (msg_len > 0) printf("INFO: received msg from server:{%s}, len:%d\r\n",(char *)(buff_down+4),msg_len);
             clock_gettime(CLOCK_MONOTONIC, &recv_time);
 
             /* Pre-allocate beacon slots in JiT queue, to check downlink collisions */
@@ -2848,11 +2862,10 @@ void thread_down(void) {
             }
 
             /* if the datagram does not respect protocol, just ignore it */
-            if ((msg_len < 4) || (buff_down[0] != PROTOCOL_VERSION) || ((buff_down[3] != PKT_PULL_RESP) && (buff_down[3] != PKT_PULL_ACK))) {
-                MSG("WARNING: [down] ignoring invalid packet len=%d, protocol_version=%d, id=%d\n",
-                        msg_len, buff_down[0], buff_down[3]);
-                continue;
-            }
+            // if ((msg_len < 4) || (buff_down[0] != PROTOCOL_VERSION) || ((buff_down[3] != PKT_PULL_RESP) && (buff_down[3] != PKT_PULL_ACK))) {
+            //     MSG("WARNING: [down] ignoring invalid packet len=%d, protocol_version=%d, id=%d\n", msg_len, buff_down[0], buff_down[3]);
+            //     continue;
+            // }
 
             /* if the datagram is an ACK, check token */
             if (buff_down[3] == PKT_PULL_ACK) {
@@ -2876,15 +2889,16 @@ void thread_down(void) {
             /* the datagram is a PULL_RESP */
             buff_down[msg_len] = 0; /* add string terminator, just to be safe */
             MSG("INFO: [down] PULL_RESP received  - token[%d:%d] :)\n", buff_down[1], buff_down[2]); /* very verbose */
-            printf("\nJSON down: %s\n", (char *)(buff_down + 4)); /* DEBUG: display JSON payload */
+            printf("\nJSON down: %s\n", (char *)(buff_down + 12)); /* DEBUG: display JSON payload */
 
             /* initialize TX struct and try to parse JSON */
             memset(&txpkt, 0, sizeof txpkt);
-            root_val = json_parse_string_with_comments((const char *)(buff_down + 4)); /* JSON offset */
+            root_val = json_parse_string_with_comments((const char *)(buff_down + 12)); /* JSON offset */
             if (root_val == NULL) {
                 MSG("WARNING: [down] invalid JSON, TX aborted\n");
                 continue;
             }
+            wait_ms(100);
 
             /* look for JSON sub-object 'txpk' */
             txpk_obj = json_object_get_object(json_value_get_object(root_val), "txpk");
@@ -3151,6 +3165,7 @@ void thread_down(void) {
             i = b64_to_bin(str, strlen(str), txpkt.payload, sizeof txpkt.payload);
             if (i != txpkt.size) {
                 MSG("WARNING: [down] mismatch between .size and .data size once converter to binary\n");
+                printf("INFO: data size => %d, %s\n",i,(char *)txpkt.payload);
             }
 
             /* free the JSON parse tree from memory */
@@ -3191,7 +3206,8 @@ void thread_down(void) {
                     txpkt.rf_power = txlut[txpkt.rf_chain].lut[tx_lut_idx].rf_power;
                 }
             }
-
+            // txpkt.rf_power = 200;
+            // wait_ms(1000);
             /* insert packet to be sent into JIT queue */
             if (jit_result == JIT_ERROR_OK) {
                 pthread_mutex_lock(&mx_concent);
