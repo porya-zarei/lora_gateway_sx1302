@@ -73,6 +73,33 @@ int main(int argc, char *argv[])
     }
 
     printf("server start listening on port (%d) ...\r\n", PORT);
+
+    uint8_t token_h = (uint8_t)rand(); /* random token */
+    uint8_t token_l = (uint8_t)rand(); /* random token */
+
+    uint8_t data_send[12] = {2, token_h, token_l, 3, 'M', 'A', 'C', '*', 'M', 'A', 'C', '#'};
+
+    JSON_Value *root;
+    const char *json_file_name = "txpkt.json";
+    const char *string_value;
+    char *result;
+
+    // Load and parse the JSON file
+    root = json_parse_file_with_comments(json_file_name);
+    if (root == NULL)
+    {
+        printf("Failed to parse JSON file.\n");
+        return 1;
+    }
+
+    string_value = json_serialize_to_string(root);
+    size_t buf_size_bytes = json_serialization_size(root);
+    printf("INFO: string value=> %s, size => %d\r\n", string_value, buf_size_bytes);
+    result = malloc(buf_size_bytes + sizeof(data_send));
+    strcat(result, (char *)data_send);
+    strcat(result, string_value);
+    // result[12 + buf_size_bytes + 1] = '\0';
+    printf("INFO: text => %s, size:%d\r\n", result, strlen(result));
     // This listen() call tells the socket to listen to the incoming connections.
     // The listen() function places all incoming connection into a backlog queue
     // until accept() call accepts the connection.
@@ -95,27 +122,6 @@ int main(int argc, char *argv[])
     uint8_t rand_num = 0;
 
     printf("server: got connection from %s port %d\n", inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port));
-    uint8_t token_h = (uint8_t)rand(); /* random token */
-    uint8_t token_l = (uint8_t)rand(); /* random token */
-
-    uint8_t data_send[255] = {2, token_h, token_l, 3, 'M', 'A', 'C', '*', 'M', 'A', 'C', '#'};
-
-    JSON_Value *root;
-    const char *json_file_name = "../txpkt.json";
-    const char *string_value;
-
-    // Load and parse the JSON file
-    root = json_parse_file(json_file_name);
-    if (root == NULL)
-    {
-        printf("Failed to parse JSON file.\n");
-        return 1;
-    }
-
-    string_value = json_serialize_to_string(root);
-    size_t buf_size_bytes = json_serialization_size(root);
-    strncat(data_send, string_value, buf_size_bytes);
-    data_send[12 + buf_size_bytes + 1] = '\n';
     printf("server start loop");
 
     while (1)
